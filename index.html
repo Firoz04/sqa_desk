@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QA Desk</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 40 40%27%3E%3Crect width=%2740%27 height=%2740%27 rx=%279%27 fill=%27%23165a4a%27/%3E%3Ctext x=%2720%27 y=%2726%27 text-anchor=%27middle%27 font-family=%27system-ui%27 font-size=%2717%27 font-weight=%27700%27 fill=%27white%27%3EQA%3C/text%3E%3C/svg%3E"><meta name="description" content="Single-page regression workspace for ERP, WMS, MES and HRM QA.">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f5f4;color:#172b2a;font:16px system-ui,sans-serif}header{background:#102a28;color:#fff;padding:20px max(24px,calc((100% - 1360px)/2));white-space:nowrap;font-weight:700;letter-spacing:.04em}header b{display:inline-grid;place-items:center;background:#c3ff83;color:#172b2a;border-radius:9px;width:31px;height:31px;margin-right:10px}main{max-width:1408px;margin:auto;padding:24px}h1{font-size:clamp(1.8rem,4vw,2.65rem);margin:0;letter-spacing:-.055em}h2{margin:0;font-size:1.17rem}p{margin:7px 0;color:#476261}.bar,.tools,.tabs,.modalActions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.bar{justify-content:space-between;margin-bottom:18px}.cards,.coverage{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card,.panel{background:white;border:1px solid #d8e2df;border-radius:13px;padding:15px}.card strong{display:block;font-size:1.95rem;letter-spacing:-.05em;margin-top:4px}.card span,.meta,summary{color:#476261;font-size:.875rem}.coverage{margin-top:10px}.coverage button{text-align:left;width:100%;background:#edf8f3}.coverage progress{display:block;width:100%;margin-top:5px;accent-color:#247a64}.workspace{margin-top:17px}.tabs{border-bottom:1px solid #d8e2df;padding-bottom:10px}.tabs button[aria-pressed=true],.primary{background:#165a4a;color:white;border-color:#165a4a}.tools{margin:10px 0}.tools input[type=search]{flex:1;min-width:180px}button,input,select,textarea{font:inherit;font-size:.875rem;color:inherit;border:1px solid #cbdad5;border-radius:7px;background:white;padding:8px 10px}button{cursor:pointer;font-weight:650}button:hover{border-color:#247a64}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #247a64;outline-offset:2px}label{display:grid;gap:4px;font-size:.875rem;font-weight:620;min-width:0}.filters,.fields{display:grid;gap:8px;grid-template-columns:repeat(4,minmax(0,1fr));margin:10px 0}.fields{grid-template-columns:repeat(2,minmax(0,1fr))}.wide{grid-column:1/-1}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:.875rem}th,td{text-align:left;padding:9px 8px;border-bottom:1px solid #e1e9e6;vertical-align:middle}th{background:#edf3f1;white-space:nowrap}td:first-child{min-width:150px}td:nth-child(2){min-width:190px}td small{display:block;color:#476261;margin-top:3px}td select{max-width:155px}.pill{display:inline-block;background:#e4eeff;color:#254b74;padding:3px 7px;border-radius:7px;white-space:nowrap}.good{background:#dbf5e2;color:#205737}.warn{background:#ffedcf;color:#724111}.bad{background:#fbe3e0;color:#812d28}.sectionTitle{display:flex;align-items:center;justify-content:space-between;margin:13px 0 7px}.stack{display:grid;gap:8px;margin-top:9px}.finding{border:1px solid #d8e2df;padding:10px;border-radius:8px}.finding p{white-space:pre-wrap}.finding button{float:right}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:15px}dialog{width:min(740px,calc(100% - 24px));max-height:92vh;border:1px solid #cbdad5;border-radius:15px;padding:19px;color:inherit}dialog::backdrop{background:#102a2899}textarea{resize:vertical;min-height:65px}.modalActions{margin-top:12px;justify-content:flex-end}footer{margin-top:12px}.muted{color:#476261}.sr{position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden}@media(max-width:780px){.cards,.coverage,.filters{grid-template-columns:repeat(2,1fr)}main{padding:14px}.twocol{grid-template-columns:1fr}}@media print{header,.tools,.tabs,.filters,button,footer,.actions{display:none!important}.scroll{overflow:visible}main{padding:0}.panel{border:0}}
+#editor{color-scheme:light;background:#fff;color:#172b2a;padding-top:0;overflow:auto}
+.dialogHeader{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;padding:12px 0 8px;border-bottom:1px solid #d8e2df}
+.dialogClose{display:grid;place-items:center;min-width:40px;min-height:40px;padding:0;font-size:1.5rem;line-height:1}
+.printReport{display:none}
+@page{size:A4 landscape;margin:12mm}
+@media print{
+body{background:#fff;color:#172b2a}
+body:has(.printReport) > main{display:none!important}
+.printReport{display:block}
+.printReport h1{font-size:19pt}
+.printReport .printMeta{font-size:9pt;margin:4pt 0 10pt}
+.printReport table{table-layout:fixed;font-size:8.5pt}
+.printReport th,.printReport td,.printReport td:first-child,.printReport td:nth-child(2){min-width:0;white-space:normal;overflow-wrap:anywhere;padding:4pt}
+.printReport th:nth-child(2){width:23%}
+.printReport thead{display:table-header-group}
+.printReport tr,.printReport article{break-inside:avoid}
+.printReport .sectionTitle{break-after:avoid}
+.printReport .pill{background:none;color:inherit;padding:0;white-space:normal}
+}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-inline:max(14px,calc((100% - 1360px)/2))}
+@media screen{body>header{position:sticky;top:0;z-index:10;box-shadow:0 1px 0 rgb(0 0 0 / 14%)}}
+header b{width:auto;min-width:44px;padding-inline:6px;font-size:.8rem;margin-right:4px}
+#themeToggle{color:#f0faf6;background:#1c3b37;border-color:#62827b;white-space:nowrap}
+@media screen{
+html[data-theme="dark"]{color-scheme:dark}
+[data-theme="dark"] body{background:#202124;color:#e3e2df}
+[data-theme="dark"] header{background:#242528;color:#e3e2df}
+[data-theme="dark"] header b{background:#88b5a5;color:#172825}
+[data-theme="dark"] #themeToggle{background:#303134;color:#e3e2df;border-color:#717277}
+[data-theme="dark"] :is(.panel,.card){background:#28292c;border-color:#45464a}
+[data-theme="dark"] :is(p,.meta,.card span,summary,td small,.muted){color:#bcbdbf}
+[data-theme="dark"] :is(button,input,select,textarea){background:#303134;color:#e3e2df;border-color:#717277}
+[data-theme="dark"] :is(input,textarea)::placeholder{color:#b3b4b7;opacity:1}
+[data-theme="dark"] :is(.primary,.tabs button[aria-pressed=true]){background:#36594e;color:#e0f0e8;border-color:#80ae9c}
+[data-theme="dark"] :is(th,.coverage button){background:#333437;color:#e3e2df}
+[data-theme="dark"] tbody tr:nth-child(even){background:#2d2e31}
+[data-theme="dark"] tbody tr:hover{background:#37383c}
+[data-theme="dark"] :is(th,td,.tabs,.finding,.dialogHeader){border-color:#45464a}
+[data-theme="dark"] #editor{color-scheme:dark;background:#28292c;color:#e3e2df;border-color:#717277}
+[data-theme="dark"] .dialogHeader{background:#28292c}
+[data-theme="dark"] .pill{background:#30404c;color:#c7d9e9}
+[data-theme="dark"] .pill.good{background:#2a4539;color:#bedfc9}
+[data-theme="dark"] .pill.warn{background:#4b3c2c;color:#ecd5ad}
+[data-theme="dark"] .pill.bad{background:#4b3436;color:#edc3c3}
+[data-theme="dark"] :focus-visible{outline-color:#a6cfc0}
+[data-theme="dark"] progress{accent-color:#88b5a5}
+}
+footer.meta{border-top:1px solid #d8e2df;padding:14px 0 10px;text-align:center}
+#workspaceOwner{margin:10px 0 0;font-size:.875rem}
+#workspaceOwner strong{font-weight:650;color:#172b2a}
+@media screen{
+[data-theme="dark"] footer.meta{border-color:#45464a}
+[data-theme="dark"] #workspaceOwner strong{color:#e3e2df}
+}
+.projectBar,.projectControls{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.projectBar{justify-content:space-between;margin-bottom:12px;padding:10px 12px}
+.projectControls{min-width:0}
+.projectControls label{margin-right:4px}
+#projectSelect{width:clamp(150px,24vw,240px);max-width:100%;text-overflow:ellipsis}
+@media print{.projectBar{display:none!important}}
+.rowActions{display:grid;grid-template-columns:minmax(max-content,1fr);gap:5px;width:max-content}
+.rowActions button{display:flex;align-items:center;gap:7px;min-height:34px;padding:5px 9px;border-radius:8px;white-space:nowrap;text-align:left}
+.rowActions button span{display:grid;place-items:center;width:17px;font-size:1rem;line-height:1}
+.rowActions :is([data-edit],[data-restore-item]){background:#e9f4ef;color:#185643;border-color:#bdd9cb}
+.rowActions [data-report]{background:#f3f6f7;color:#324953;border-color:#cbd8de}
+.rowActions [data-delete-item]{background:#fcf1f1;color:#922f35;border-color:#e7bfc2}
+.rowActions button:hover{border-color:currentColor}
+@media screen{
+[data-theme="dark"] .rowActions :is([data-edit],[data-restore-item]){background:#293e36;color:#c2e7d5;border-color:#56766a}
+[data-theme="dark"] .rowActions [data-report]{background:#30363d;color:#d7e2eb;border-color:#606c78}
+[data-theme="dark"] .rowActions [data-delete-item]{background:#423034;color:#f1c8cd;border-color:#8c5d65}
+[data-theme="dark"] .rowActions button:hover{border-color:currentColor}
+}
+.manageMenu{position:relative}
+.manageMenu summary{cursor:pointer;display:list-item;list-style-position:inside;border:1px solid #cbdad5;border-radius:8px;background:#f3f8f6;color:#234742;font-weight:650;padding:8px 10px}
+.manageMenu summary:focus-visible,.stickyTable:focus-visible{outline:2px solid #247a64;outline-offset:2px}
+.manageActions{position:absolute;z-index:3;top:calc(100% + 6px);left:0;display:grid;gap:4px;min-width:170px;padding:6px;background:#fff;border:1px solid #cbdad5;border-radius:10px;box-shadow:0 8px 20px #102a2820}
+.manageActions button{text-align:left;white-space:nowrap}
+.metricLabel{display:flex;align-items:center;gap:8px}
+.metricLabel .metricIcon{display:grid;place-items:center;width:27px;height:27px;border-radius:7px;background:#edf3f1;color:#335953;font-weight:700}
+#metrics .card strong{font-size:2.2rem;line-height:1.15;margin:8px 0 4px}
+#metrics .card:nth-child(2) .metricIcon{background:#dbf5e2;color:#205737}
+#metrics .card:nth-child(3) .metricIcon{background:#fbe3e0;color:#812d28}
+#metrics .card:nth-child(4) .metricIcon{background:#ffedcf;color:#724111}
+.filterChips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;min-width:0}
+.filterChips:empty{display:none}
+.filterChips button{border-radius:999px;background:#edf6f1;color:#215344;max-width:100%;overflow-wrap:anywhere;text-align:left;padding:5px 10px}
+.filterChips button span{font-weight:500}
+@media screen{
+.stickyTable{max-height:min(60vh,520px)}
+.stickyTable thead th{position:sticky;top:0;z-index:1;box-shadow:0 1px 0 #b8cac4}
+[data-theme="dark"] .manageMenu summary,[data-theme="dark"] .manageActions{background:#303134;color:#e3e2df;border-color:#717277}
+[data-theme="dark"] #metrics .card .metricIcon{background:#353a3b;color:#d1ddd9}
+[data-theme="dark"] #metrics .card:nth-child(2) .metricIcon{background:#2a4539;color:#bedfc9}
+[data-theme="dark"] #metrics .card:nth-child(3) .metricIcon{background:#4b3436;color:#edc3c3}
+[data-theme="dark"] #metrics .card:nth-child(4) .metricIcon{background:#4b3c2c;color:#ecd5ad}
+[data-theme="dark"] .filterChips button{background:#293e36;color:#c2e7d5}
+[data-theme="dark"] .stickyTable thead th{box-shadow:0 1px 0 #45464a}
+}
+@media print{.filterChips{display:none!important}}
+body>header{padding-block:12px}
+.headerContext{display:flex;align-items:center;flex-wrap:wrap;min-width:0;gap:5px 12px}
+.headerContext .brand{display:inline-flex;align-items:center;gap:8px;letter-spacing:0}
+.headerContext .brandIcon{width:36px;min-width:36px;height:34px;margin:0;padding:0;background:#165a4a;color:#fff;border:1px solid #ffffff38;font-size:.83rem;font-weight:750}
+.headerContext .brandName{font-size:1.05rem;font-weight:700}
+.headerProject{display:inline-block;min-width:0;max-width:min(18ch,100%);padding:2px 5px;border-radius:5px;background:#284541;color:#edf5f1;font-size:.75rem;line-height:1.25;font-weight:600;letter-spacing:normal;overflow:hidden;text-overflow:ellipsis}
+body>header #themeToggle{flex-shrink:0}
+#appVersion{display:inline-block;margin-top:8px;font-size:.8125rem;color:#476261}
+@media screen{
+[data-theme="dark"] .headerProject{background:#38393d;color:#e3e2df}
+[data-theme="dark"] #appVersion{color:#bcbdbf}
+}
+#metrics button.card{text-align:left;font-weight:400;min-width:0}
+#metrics button.card:hover,#metrics button.card[aria-pressed=true]{border-color:#43836f}
+html{scroll-padding-top:76px}
+.filters select,.fields select{width:100%;min-width:0;max-width:100%;text-overflow:ellipsis}
+
+@media screen{
+  body>header{border-bottom:1px solid #ffffff1f}
+  .headerContext{flex-wrap:nowrap;gap:8px}
+  .headerContext .brand{flex:none}
+  .headerActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
+  .headerProject{max-width:12ch;font-size:.65rem}
+  .headerProject:empty{display:none}
+  [data-theme="dark"] .headerContext .brandIcon{background:#36594e;color:#f2f8f5}
+  .stickyTable{border:1px solid #d8e2df;border-radius:10px}
+  .stickyTable th,.stickyTable td{padding:8px 10px}
+  .stickyTable th{font-size:.8rem}
+  .stickyTable tbody tr:nth-child(even){background:#f6f9f8}
+  .stickyTable tbody tr:hover,.stickyTable tbody tr:focus-within{background:#edf6f1}
+  .stickyTable tbody tr:last-child td{border-bottom:0}
+  .stickyTable .rowActions{gap:6px}
+  .stickyTable .rowActions button:focus-visible{outline-offset:1px}
+  [data-theme="dark"] .stickyTable{border-color:#45464a}
+  [data-theme="dark"] .stickyTable tbody tr:nth-child(even){background:#2d2e31}
+  [data-theme="dark"] .stickyTable tbody tr:hover,[data-theme="dark"] .stickyTable tbody tr:focus-within{background:#37383c}
+}
+
+.headerContext .brandIcon{display:inline-flex;justify-content:center;gap:4px;width:55px;min-width:55px}
+.brandChecklist{display:block;flex:none;width:12px;height:15px;fill:none;stroke:currentColor;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
+.headerContext .brandName{color:#fff;font-size:1.125rem;font-weight:800;letter-spacing:.01em}
+.brandName span{color:#a8e6ca;font-weight:550}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+  .brandChecklist{transition:transform 150ms ease-out}
+  .brand:hover .brandChecklist{transform:translateY(-2px)}
+}
+@media(max-width:420px){.headerActions{gap:5px}.headerProject{max-width:9ch}.headerContext .brandName{font-size:1rem}#themeToggle{padding-inline:6px}}
+
+#rowForm .fields{padding:10px 12px 12px;border:1px solid #d8e2df;border-radius:9px;min-inline-size:0}
+#rowForm legend{padding:0 5px;font-size:.875rem;font-weight:700}
+#rowForm :is(input,select,textarea){min-width:0;scroll-margin-block:60px 120px}
+.editorFooter{position:sticky;bottom:-19px;padding:8px 0 12px;background:#fff;border-top:1px solid #d8e2df}
+.editorFooter .modalActions{margin-top:0}
+#formError{color:#812d28}
+#formError:empty{display:none}
+@media(max-width:600px){#rowForm .fields{grid-template-columns:minmax(0,1fr)}}
+@media screen{
+.pill,.executionStatus{font-weight:650}
+:is(.pill,.executionStatus).neutral{background:#e9edef;color:#3d4a51}
+.executionStatus.good{background:#dbf5e2;color:#205737}
+.executionStatus.bad{background:#fbe3e0;color:#812d28}
+.executionStatus.warn{background:#ffedcf;color:#724111}
+[data-theme="dark"] :is(.pill,.executionStatus).neutral{background:#3b3d42;color:#e0e1e4}
+[data-theme="dark"] .executionStatus.good{background:#2a4539;color:#bedfc9}
+[data-theme="dark"] .executionStatus.bad{background:#4b3436;color:#edc3c3}
+[data-theme="dark"] .executionStatus.warn{background:#4b3c2c;color:#ecd5ad}
+[data-theme="dark"] .editorFooter{background:#28292c}
+[data-theme="dark"] :is(#rowForm .fields,.editorFooter){border-color:#45464a}
+[data-theme="dark"] #formError{color:#edc3c3}
+}
+@media screen{
+#metrics .card[data-metric="execution"] strong{font-size:clamp(1rem,2vw,1.55rem)}
+#metrics .card progress{display:block;width:100%;height:8px;margin:0 0 6px;accent-color:#247a64}
+.emptyState{margin:12px 0;padding:12px 14px;border:1px dashed #b8cac4;border-radius:9px}
+.emptyState p{margin:0 0 6px}
+[data-theme="dark"] #metrics .card progress{accent-color:#88b5a5}
+[data-theme="dark"] .emptyState{border-color:#717277}
+}
+.recordId{background:none!important;border:0;padding:1px 2px;text-align:left;text-decoration:underline;text-underline-offset:3px;color:inherit}
+#editor.detailsDrawer{position:fixed;inset:0 0 0 auto;margin:0;width:min(440px,100%);height:100%;max-height:none;border-radius:14px 0 0 14px}
+.recordDetails dt{font-weight:700;margin-top:14px}
+.recordDetails dd{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+@media screen{
+.stickyTable tbody tr.executionUpdated{outline:2px solid #88b5a5;outline-offset:-2px}
+}
+@media (prefers-reduced-motion:no-preference){
+.executionUpdated{animation:executionFlash 1.2s ease-out both}
+@keyframes executionFlash{from{outline-color:#88b5a5}to{outline-color:transparent}}
+}
+@media print{#editor{display:none!important}}
+.backupControls{display:grid;grid-template-columns:auto auto;align-items:center;gap:4px 8px}
+#backupStatus{grid-column:1/-1;font-size:.72rem;justify-self:start}
+#backupStatus.backupDue{background:#ffedcf;color:#724111;border-radius:5px;padding:2px 6px}
+@media screen{[data-theme="dark"] #backupStatus.backupDue{background:#4b3c2c;color:#ecd5ad}}
+@media print{.backupControls{display:none!important}}
+</style></head><body><header><div class="headerContext"><span class="brand"><b class="brandIcon" aria-hidden="true"><svg class="brandChecklist" viewBox="0 0 12 15" aria-hidden="true" focusable="false"><rect x="1" y="1" width="10" height="13" rx="2"/><path d="M3.5 4.5 5 6 8.3 3.5 M3.5 8.7h5 M3.5 11h5"/></svg>QA</b><span class="brandName">SQA <span>Desk</span></span></span></div><div class="headerActions"><span id="headerProject" class="headerProject" aria-live="polite"></span><button id="themeToggle" type="button" aria-pressed="false"><span id="themeIcon" aria-hidden="true">☾</span> <span id="themeLabel">Dark mode</span></button></div></header><main>
+<div class="bar"><div><h1>QA Workspace</h1><p>Test Execution · Defects · Regression</p></div>
+<div class="tools" role="group" aria-label="Reports and backups"><button id="dailySummary">Daily QA Summary</button><button id="print">Print view</button><button id="export">Export CSV</button><div class="backupControls"><button id="backup">Backup JSON</button><button id="restore">Restore JSON</button><span id="backupStatus" class="meta" role="status"></span></div><input id="backupFile" type="file" accept=".json,application/json" hidden></div></div>
+<div class="panel projectBar" role="group" aria-label="Project setup">
+<div class="projectControls"><label for="projectSelect">Project / Software</label><select id="projectSelect"></select><details id="manageMenu" class="manageMenu"><summary>Manage</summary><div class="manageActions"><button id="addProject">+ Add Project</button><button id="addModule">+ Add Module</button><button id="addSubModule">+ Add Sub-module</button><button id="rename">Rename</button></div></details></div>
+<button class="primary" id="add">+ New item</button></div>
+<section class="cards" id="metrics" aria-label="Regression dashboard"></section><section class="coverage" id="coverage" aria-label="Module coverage"></section>
+<section class="panel workspace"><nav class="tabs" aria-label="Workspace views" id="tabs"></nav>
+<div class="tools"><label class="sr" for="q">Search records</label><input id="q" type="search" placeholder="Search by ID, scenario, notes or evidence"><label class="sr" for="saved">Saved filters</label><select id="saved"></select><button id="saveFilter">Save filters</button><button id="clear">Clear</button></div>
+<div class="filters" id="filters"></div><div id="filterChips" class="filterChips" role="group" aria-label="Active filters"></div><div id="content"></div></section>
+<footer class="meta"><span id="feedback" role="status"></span><p>Records and saved filters are stored in this browser.</p><p id="workspaceOwner"><strong id="workspaceOwnerName"></strong> · Software QA Engineer</p><span id="appVersion" aria-label="SQA Desk version 1.1">v1.1</span></footer>
+</main><dialog id="editor" aria-labelledby="dialogTitle"></dialog><script>
+const defaultModules=['ERP','WMS','MES','HRM'];
+const modules=[...defaultModules];
+const options={module:modules,type:['Positive','Negative','Boundary Value Analysis','Equivalence Partitioning','UI/UX','Functional','Integration','API','End-to-End (E2E)','Smoke','Sanity','Regression','Retest','Permission / Access Control','Data Integrity','Performance','Compatibility','Accessibility','Exploratory','User Acceptance Testing (UAT)'],priority:['P0','P1','P2','P3'],severity:['Critical','High','Medium','Low'],execution:['Pass','Partial','Not Run','Fail','Blocked'],defect:['Open','In Progress','Ready for Retest','Reopened','Verified','Closed','Unknown','N/A'],automation:['Manual Only','Candidate','In Progress','Automated','Needs Maintenance','Blocked'],tool:['Playwright','Selenium','WebdriverIO','Postman'],regression:['Verified Fix','Reopened Defect','New Defect','Untested Scenario','Regression Risk','Needs Retest']};
+const labels={module:'Module',sub:'Sub-module',type:'Test type',priority:'Priority',severity:'Severity',execution:'Execution status',defect:'Defect status',automation:'Automation status',tool:'Automation tool',regression:'Regression status',id:'Record ID',title:'Summary',kind:'Record type',defectId:'Linked defect ID',pre:'Preconditions',data:'Test data',steps:'Steps to reproduce',expected:'Expected result',actual:'Actual result',evidence:'Evidence links or references',notes:'Notes',autoNotes:'Automation notes',confirmed:'Confirmed findings',assumptions:'Assumptions',risk:'Regression risk details'};
+const filterKeys=['module','sub','type','priority','severity','execution','defect','automation','regression','tool'];
+const longKeys=['pre','data','steps','expected','actual','evidence','risk','notes','autoNotes','confirmed','assumptions'];
+const base={kind:'Test case',module:'ERP',execution:'Not Run',defect:'N/A',automation:'Manual Only',regression:'Untested Scenario'};
+</script><script>'use strict';
+const $=id=>document.getElementById(id);
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const key='sqa-desk-workspace-clean-v1';
+const backupStatusKey='sqa-desk-last-backup';
+const backupReminderAge=7*24*60*60*1000;
+let lastBackup;
+try{lastBackup=JSON.parse(localStorage.getItem(backupStatusKey));}catch{}
+function backupFingerprint(){
+  const data=JSON.stringify(workspace.projects);
+  let hash=2166136261;
+  for(let i=0;i<data.length;i++)hash=Math.imul(hash^data.charCodeAt(i),16777619);
+  return hash>>>0;
+}
+function renderBackupStatus(){
+  const badge=$('backupStatus');
+  const time=lastBackup?.time;
+  const hasBackup=Number.isFinite(time)&&time>0;
+  const recommended=hasBackup&&Date.now()-time>=backupReminderAge&&lastBackup.fingerprint!==backupFingerprint();
+  badge.classList.toggle('backupDue',recommended);
+  const formatted=hasBackup?new Intl.DateTimeFormat('en-GB',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Dhaka'}).format(time):'';
+  badge.textContent=recommended?'Backup recommended':hasBackup?'Last backup started: '+formatted:'No backup yet';
+  badge.title=recommended?'Last backup started: '+formatted:'';
+}
+const ownerName='Md. Firoz Hasan';
+const preparedBy='Prepared by '+ownerName;
+$('workspaceOwnerName').textContent=ownerName;
+const themeKey='sqa-desk-theme';
+function applyTheme(theme){
+  const dark=theme==='dark';
+  document.documentElement.dataset.theme=dark?'dark':'light';
+  const toggle=$('themeToggle');
+  $('themeIcon').textContent=dark?'☀':'☾';
+  $('themeLabel').textContent=dark?'Light mode':'Dark mode';
+  toggle.setAttribute('aria-pressed',String(dark));
+}
+let preferredTheme;
+try{preferredTheme=localStorage.getItem(themeKey);}catch{}
+applyTheme(preferredTheme);
+$('themeToggle').onclick=()=>{
+  const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';
+  applyTheme(theme);
+  try{localStorage.setItem(themeKey,theme);}catch{}
+};
+let stored,loadedStorage=null,storageLoadError=false;
+try{loadedStorage=localStorage.getItem(key);stored=JSON.parse(loadedStorage);}catch{storageLoadError=true;}
+const defaultProjectName='Default Project';
+function wrapLegacy(data){return {active:0,projects:[{name:defaultProjectName,data}]};}
+let workspace=stored?.projects?.length?stored:wrapLegacy(stored??{rows:[],templates:[],saved:[],emptyCatalog:true});
+let state=workspace.projects[workspace.active].data;
+function syncModules(){modules.splice(0,modules.length,...(state.emptyCatalog?[]:defaultModules),...(state.customModules??[]));}
+syncModules();
+const projectViews=new Map();
+let filters={},view='Matrix',editing=null,templateMode=false,draft=null,sourceCase=null;
+const views=['Matrix','Test cases','Defects','Regression','Findings & assumptions','Templates','Archived items'];
+const viewLabels={'Test cases':'Test Case Matrix','Defects':'Defect Tracker'};
+const regressionStates=options.regression.filter(status=>status!=='Untested Scenario');
+const defaultFilters=[
+{name:'MES tracked issues',view:'Defects',filters:{module:'MES',q:'Manufacturing_Issue-'}},
+{name:'WMS tracked issues',view:'Defects',filters:{module:'WMS',q:'WMS_Issue-'}},
+{name:'HRM execution',view:'Test cases',filters:{module:'HRM'}},
+{name:'HRM open defects',view:'Defects',filters:{module:'HRM',defect:'Open'}}];
+const tell=message=>{$('feedback').textContent=message;};
+function saveWorkspace(data){
+  if(localStorage.getItem(key)!==loadedStorage){
+    tell('Another tab saved newer data. This tab did not overwrite it. Back up any unsaved changes here and reload.');
+    return false;
+  }
+  const serialized=JSON.stringify(data);
+  localStorage.setItem(key,serialized);
+  loadedStorage=serialized;
+  storageLoadError=false;
+  renderBackupStatus();
+  return true;
+}
+function persist(message){try{if(saveWorkspace(workspace))tell(message);}catch{tell('Browser storage is unavailable. Export your current records before leaving.');}}
+const sameDefectId=(value,id)=>Boolean(value&&id&&value.trim().toLowerCase()===id.trim().toLowerCase());
+const option=(value,label=value,selected='')=>'<option value="'+esc(value)+'"'+(value===selected?' selected':'')+'>'+esc(label)+'</option>';
+const choose=(values,selected,empty)=>option('',empty,selected)+values.map(x=>option(x,x,selected)).join('');
+const isOpen=x=>['Open','In Progress','Ready for Retest','Reopened'].includes(x.defect);
+const metricViews={
+  execution:{icon:'◫',label:'Execution progress',view:'Test cases',help:'Test cases with Pass or Fail',matches:x=>x.kind==='Test case'&&['Pass','Fail'].includes(x.execution)},
+  verified:{icon:'✓',label:'Verified fixes',view:'Regression',help:'Historical or recorded retests',matches:x=>x.regression==='Verified Fix'},
+  open:{icon:'!',label:'Open defects',view:'Defects',help:'Includes reopened and ready for retest',matches:x=>x.kind==='Defect'&&isOpen(x)},
+  followup:{icon:'↺',label:'Regression follow-up',view:'Regression',help:'Retests, risks and defect follow-up',matches:x=>['Needs Retest','Reopened Defect','New Defect','Regression Risk'].includes(x.regression)}
+};
+function renderMetrics(){
+const rows=state.rows.filter(x=>!x.archivedAt), cases=rows.filter(x=>x.kind==='Test case');
+$('metrics').innerHTML=Object.entries(metricViews).map(([key,{icon,label,help,matches}])=>{
+  const count=rows.filter(matches).length;
+  const value=key==='execution'?count+' / '+cases.length+' completed':count;
+  const progress=key==='execution'?'<progress aria-label="Execution progress" max="'+Math.max(1,cases.length)+'" value="'+count+'"></progress>':'';
+  return '<button type="button" class="card" data-metric="'+key+'" aria-pressed="'+(filters.metric===key&&view===metricViews[key].view)+'"><div class="metricLabel"><span class="metricIcon" aria-hidden="true">'+icon+'</span><span>'+label+'</span></div><strong>'+value+'</strong>'+progress+'<span>'+help+'</span></button>';
+}).join('');
+$('coverage').innerHTML=modules.map(module=>{const m=esc(module);const all=cases.filter(x=>x.module===module), complete=all.filter(x=>['Pass','Fail'].includes(x.execution)).length;return '<button data-module="'+m+'"><strong>'+m+'</strong> <span class="meta">'+complete+'/'+all.length+' cases completed</span><progress aria-label="'+m+' coverage" max="'+Math.max(1,all.length)+'" value="'+complete+'"></progress></button>';}).join('');
+}
+function matches(){
+return state.rows.filter(x=>{if(Boolean(x.archivedAt)!==(view==='Archived items'))return false;if(view==='Test cases'&&x.kind!=='Test case'||view==='Defects'&&x.kind!=='Defect')return false;
+if(view==='Regression'&&!regressionStates.includes(x.regression)&&filters.regression!=='Untested Scenario')return false;
+if(Object.hasOwn(metricViews,filters.metric)&&!metricViews[filters.metric].matches(x))return false;
+if(filterKeys.some(k=>filters[k]&&(k==='type'?!testTypes(x.type).includes(filters[k]):x[k]!==filters[k])))return false;
+const haystack=Object.values(x).join(' ').toLowerCase();
+return (filters.q??'').trim().toLowerCase().split(/\s+/).every(word=>haystack.includes(word));});
+}
+function subModules(parent){
+  const items=[...state.rows,...state.templates,...(state.customSubModules??[])];
+  return [...new Set(items.filter(x=>!parent||x.module===parent).map(x=>x.sub).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function projectFilters(){return [...(state.emptyCatalog?[]:defaultFilters),...state.saved];}
+function renderControls(){
+$('tabs').innerHTML=views.map(v=>'<button data-view="'+esc(v)+'" aria-pressed="'+(v===view)+'">'+esc(viewLabels[v]??v)+'</button>').join('');
+$('q').value=filters.q??'';
+$('filters').hidden=view==='Templates';
+$('filters').style.display=view==='Templates'?'none':'';
+$('q').placeholder=view==='Templates'?'Search templates':'Search by ID, scenario, notes or evidence';
+$('saved').innerHTML=option('','Saved filters')+projectFilters().map((x,i)=>option(String(i),x.name)).join('');
+$('filters').innerHTML=filterKeys.map(k=>{
+const values=k==='sub'?subModules(filters.module):options[k];
+return '<label>'+labels[k]+'<select data-filter="'+k+'">'+choose(values,filters[k],'All')+'</select></label>';
+}).join('');
+}
+function statusClass(x){return x==='Not Run'?'neutral':['Pass','Verified','Verified Fix','Automated'].includes(x)?'good':['Fail','Reopened','Open','Reopened Defect'].includes(x)?'bad':['Partial','Blocked','Needs Retest','Regression Risk'].includes(x)?'warn':'';}
+function status(x){return '<span class="pill '+statusClass(x)+'">'+esc(x||'—')+'</span>';}
+function table(rows,kind){
+const defs=kind==='Defects';
+return '<div class="sectionTitle"><h2>'+(viewLabels[kind]??kind)+'</h2><span class="meta">'+rows.length+' records</span></div>'+(rows.length?'<div class="scroll stickyTable" tabindex="0" role="region" aria-label="'+esc(viewLabels[kind]??kind)+'"><table><thead><tr><th scope="col">ID / Module</th><th scope="col">Scenario</th><th scope="col">Type</th><th scope="col">Priority / Severity</th><th scope="col">Execution</th><th scope="col">'+(defs?'Defect status':'Linked defect')+'</th><th scope="col">Regression</th><th scope="col">Automation</th><th scope="col" class="actions">Actions</th></tr></thead><tbody>'+rows.map(x=>{
+const id=esc(x.id);
+const actions=x.archivedAt?'<button data-restore-item="'+id+'"><span aria-hidden="true">↶</span>Restore</button> <button data-delete-item="'+id+'"><span aria-hidden="true">×</span>Permanent Delete</button>':'<button data-edit="'+id+'"><span aria-hidden="true">✎</span>Edit</button> <button data-report="'+id+'"><span aria-hidden="true">≡</span>Bug report</button>'+(x.kind==='Test case'&&x.execution==='Fail'&&!x.archivedAt&&!x.defectId?'<button data-log-defect="'+id+'"><span aria-hidden="true">+</span>Log defect</button>':'')+(x.kind==='Defect'&&!x.archivedAt?'<button data-retest="'+id+'"><span aria-hidden="true">↺</span>'+(retests(x).length?'Retest history':'Add retest')+'</button>':'');
+const execution=x.archivedAt?status(x.execution):'<select class="executionStatus '+statusClass(x.execution)+'" aria-label="Execution for '+id+'" data-exec="'+id+'">'+choose(options.execution,x.execution,'Select')+'</select>';
+return '<tr><td><strong><button type="button" class="recordId" data-details="'+id+'">'+id+'</button></strong><small>'+esc(x.module)+' · '+esc(x.sub||'Unassigned')+'</small></td><td>'+esc(x.title)+(x.evidence?'<small>Evidence recorded</small>':'')+'</td><td>'+esc(testTypes(x.type).join(' · ')||'—')+'</td><td>'+esc(x.priority||'—')+' / '+esc(x.severity||'—')+'</td><td>'+execution+'</td><td>'+(defs?status(x.defect):esc(x.defectId||'—'))+'</td><td>'+status(x.regression)+'</td><td>'+esc(x.automation||'—')+'<small>'+esc(x.tool||'')+'</small></td><td class="actions"><div class="rowActions">'+actions+'</div></td></tr>';
+}).join('')+'</tbody></table></div>':'<p class="meta">No matching records.</p>');
+}
+function activeFilters(){
+  const keys=view==='Templates'?['q']:['metric','q',...filterKeys];
+  return keys.filter(k=>filters[k]);
+}
+$('filterChips').onclick=e=>{
+  const chip=e.target.closest('button[data-remove-filter]');
+  if(!chip)return;
+  const k=chip.dataset.removeFilter;
+  delete filters[k];
+  if(k==='module')delete filters.sub;
+  render();
+  $('q').focus();
+};
+function renderContent(){
+$('filterChips').innerHTML=activeFilters().map(k=>{
+  const label=esc(k==='metric'?'Dashboard':labels[k]??'Search');
+  const value=esc(k==='metric'?metricViews[filters[k]]?.label??filters[k]:filters[k]);
+  return '<button type="button" data-remove-filter="'+k+'" aria-label="Remove '+label+' filter: '+value+'"><span>'+label+'</span> '+value+' <span aria-hidden="true">×</span></button>';
+}).join('');
+const rows=matches();
+const content=$('content');
+if(storageLoadError){
+  content.innerHTML='<p class="emptyState" role="alert">Saved workspace could not be loaded. If you have a backup, use Restore JSON.</p>';
+  return;
+}
+if(!rows.length&&view!=='Templates'){
+  const hasRecords=state.rows.some(x=>Boolean(x.archivedAt)===(view==='Archived items'));
+  const canClear=hasRecords&&activeFilters().length>0;
+  const message=canClear?'No records match the current filters.':hasRecords?'No records in this view.':view==='Archived items'?'No archived records in this project.':'No active records in this project.';
+  content.innerHTML='<div class="emptyState"><p role="status">'+message+'</p>'+(canClear?'<button type="button" id="clearEmptyFilters">Clear filters</button>':'')+'</div>';
+  $('clearEmptyFilters')?.addEventListener('click',()=>{$('clear').click();$('q').focus();});
+  return;
+}
+if(view==='Templates'){
+const query=(filters.q??'').toLowerCase().trim();
+$('content').innerHTML='<div class="sectionTitle"><h2>Reusable test and demo data templates</h2><button id="newTemplate">+ Template</button></div><div class="stack">'+state.templates.map((t,i)=>Object.values(t).join(' ').toLowerCase().includes(query)?'<article class="finding"><strong>'+esc(t.title)+'</strong> <span class="meta">'+esc(t.module)+'</span><button data-template-edit="'+i+'">Edit</button><p>'+esc(t.data||t.steps||'')+'</p><button data-template="'+i+'">Use template</button></article>':'').join('')+'</div>';
+}else if(view==='Findings & assumptions'){
+$('content').innerHTML='<div class="twocol">'+[['Confirmed findings','confirmed'],['Assumptions','assumptions']].map(([title,k])=>{
+const filtered=rows.filter(x=>x[k]);return '<section class="stack"><h2>'+title+'</h2>'+(filtered.length?filtered.map(x=>'<article class="finding"><button data-edit="'+esc(x.id)+'">Edit</button><strong>'+esc(x.id)+'</strong><p>'+esc(x[k])+'</p></article>').join(''):'<p>No matching entries.</p>')+'</section>';
+}).join('')+'</div>';
+}else{
+$('content').innerHTML=(view==='Defects'?'':table(rows.filter(x=>x.kind==='Test case'),'Test cases'))+(view==='Test cases'?'':table(rows.filter(x=>x.kind==='Defect'),'Defects'));
+}
+}
+function render(){
+  const activeProjectName=workspace.projects[workspace.active].name;
+  $('headerProject').textContent=activeProjectName;
+  $('headerProject').title=activeProjectName;
+  $('projectSelect').innerHTML=workspace.projects.map((project,i)=>option(String(i),project.name,String(workspace.active))).join('');
+  renderMetrics();renderControls();renderContent();
+}
+function selectProject(index){
+  projectViews.set(workspace.projects[workspace.active],{view,filters:{...filters}});
+  workspace.active=index;
+  state=workspace.projects[index].data;syncModules();
+  const remembered=projectViews.get(workspace.projects[index]);
+  filters={...remembered?.filters};view=remembered?.view??'Matrix';render();
+}
+const editor=$('editor');
+function dialogHeader(title){
+  return '<div class="dialogHeader"><h2 id="dialogTitle">'+esc(title)+'</h2><button class="dialogClose" type="button" data-close aria-label="Close dialog">&times;</button></div>';
+}
+function testTypes(value){return [...new Set(String(value??'').split('\n').filter(Boolean))];}
+function field(k,x){
+if(k==='defectId'){
+  const linked=x.defectId??'';
+  const defects=state.rows.filter(row=>row.kind==='Defect'&&row!==x&&(!row.archivedAt||sameDefectId(linked,row.id)));
+  const current=defects.find(row=>sameDefectId(linked,row.id))?.id??linked;
+  const choices=defects.map(row=>option(row.id,row.id+' · '+row.title+(row.archivedAt?' (archived)':''),current)).join('');
+  const legacy=linked&&!defects.some(row=>sameDefectId(linked,row.id))?option(linked,linked+' (unavailable)',linked):'';
+  return '<label>'+labels[k]+'<select name="defectId">'+option('','None',current)+choices+legacy+'</select></label>';
+}
+if(k==='type'&&testTypes(x.type).length>1){
+  const preserved=option(x.type,testTypes(x.type).join(' · '),x.type);
+  return '<label>Test type<select name="type">'+preserved+choose(options.type,undefined,'Select')+'</select></label>';
+}
+const values=k==='kind'?['Test case','Defect']:k==='sub'?(x.module?subModules(x.module):[]):options[k];
+const name=labels[k], value=esc(x[k]);
+return '<label'+(longKeys.includes(k)?' class="wide"':'')+'>'+name+(values?'<select name="'+k+'">'+choose(values,x[k],'Select')+'</select>':longKeys.includes(k)?'<textarea name="'+k+'">'+value+'</textarea>':'<input name="'+k+'" value="'+value+'"'+(['id','title'].includes(k)?' required':'')+'>')+'</label>';
+}
+function edit(row,index=null,asTemplate=false,linkedCase=null){
+editing=index;templateMode=asTemplate;draft=row;sourceCase=linkedCase;
+const keys=asTemplate?['title','module','sub','type','priority','severity','tool','automation','pre','data','steps','expected','autoNotes']:['id','title','kind','module','sub','type','priority','severity','execution','defect','regression','defectId','tool','automation',...longKeys];
+const sections=[
+  ['Record details',['id','title','kind','module','sub','type','priority','severity','execution','defect','regression','defectId']],
+  ['Test steps & results',['pre','data','steps','expected','actual']],
+  ['Evidence & notes',['evidence','risk','notes','confirmed','assumptions']],
+  ['Automation',['tool','automation','autoNotes']]
+];
+editor.innerHTML='<form id="rowForm">'+dialogHeader(asTemplate?'Template':index===null?'New item':'Edit '+row.id)+'<div class="editorFields">'+sections.map(([label,fields])=>{const available=fields.filter(k=>keys.includes(k));return available.length?'<fieldset class="fields"><legend>'+label+'</legend>'+available.map(k=>field(k,row)).join('')+'</fieldset>':'';}).join('')+'</div><div class="editorFooter"><p id="formError" role="alert"></p><div class="modalActions"><button type="button" data-close>Cancel</button>'+(!asTemplate?'<button type="button" id="asTemplate">Save as template</button>'+(index!==null?(row.kind==='Test case'?'<button type="button" id="duplicateTest">Duplicate</button>':'')+'<button type="button" id="archiveItem">Archive</button>':''):'')+'<button class="primary" type="submit">Save</button></div></div></form>';
+editor.showModal();
+}
+function fresh(overrides={}){
+const kind=overrides.kind??(view==='Defects'?'Defect':'Test case');
+let n=1,id;
+do{id=(kind==='Defect'?'DEF-':'TC-')+String(n++).padStart(3,'0');}while(state.rows.some(x=>x.id===id));
+return {...base,id,module:filters.module||modules[0]||'',kind,...(kind==='Defect'?{defect:'Open',regression:'New Defect'}:{}),...overrides};
+}
+function values(form){
+  const entries=new FormData(form);
+  const result=Object.fromEntries([...entries].map(([k,v])=>[k,v.trim()]));
+  return result;
+}
+function templateOf(x){return Object.fromEntries(['title','module','sub','type','priority','severity','tool','automation','pre','data','steps','expected','autoNotes'].map(k=>[k,x[k]??'']));}
+function download(name,body,type){
+const url=URL.createObjectURL(new Blob([body],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function bugText(x){
+const title='['+x.module+'] '+x.title.replace(/^\[[^\]]+\]\s*/,'');
+return title+'\n\n'+[['Defect ID',x.kind==='Defect'?x.id:x.defectId],['Source record',x.id],['Sub-module',x.sub],['Severity',x.severity],['Priority',x.priority],['Preconditions',x.pre],['Test data',x.data],['Steps to reproduce',x.steps],['Expected result',x.expected],['Actual result',x.actual],['Evidence',x.evidence],['Regression risk',x.risk],['Notes',x.notes]].map(([label,value])=>label+'\n'+(value||'Pending input')).join('\n\n')+'\n\n'+preparedBy;
+}
+const retestResults=['Pass','Fail','Blocked'];
+let retestTarget=null;
+function retests(item){
+  try{
+    const entries=JSON.parse(item.retestHistory??'[]');
+    return Array.isArray(entries)?entries.filter(e=>e&&[e.date,e.build,e.environment,e.result,e.evidence].every(v=>typeof v==='string')):[];
+  }catch{return [];}
+}
+function openRetests(item){
+  retestTarget=item;
+  const today=qaDate();
+  const entries=retests(item);
+  const history=entries.length?'<div class="stack">'+entries.slice().reverse().map(e=>'<article class="finding"><strong>'+esc(e.date)+'</strong> · '+esc(e.build)+' · '+esc(e.environment)+' '+status(e.result)+(e.evidence?'<p>'+esc(e.evidence)+'</p>':'')+'</article>').join('')+'</div>':'<p class="meta">No retests recorded.</p>';
+  editor.innerHTML=dialogHeader('Retest history · '+item.id)+history+
+    '<form id="retestForm"><div class="fields"><label>Retest date<input type="date" name="date" value="'+esc(today)+'" required autofocus></label><label>Build<input name="build" placeholder="e.g. 1.4.3" required></label>'+
+    '<label>Environment<input name="environment" list="retestEnvironments" required><datalist id="retestEnvironments"><option value="Local"><option value="QA / Test"><option value="Staging"><option value="UAT"><option value="Production"></datalist></label>'+
+    '<label>Result<select name="result" required>'+choose(retestResults,'','Select result')+'</select></label><label class="wide">Evidence / Notes<textarea name="evidence"></textarea></label></div>'+
+    '<p id="retestError" role="alert"></p><div class="modalActions"><button type="button" data-close>Close</button><button class="primary" type="submit">Save retest</button></div></form>';
+  if(!editor.open)editor.showModal();
+}
+function qaDate(){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+}
+const qaActivityTypes=['Test results','New defects','Verified fixes'];
+function recordQAActivity(item,previous){
+  const add=(type,detail)=>{
+    state.qaActivity??=[];
+    state.qaActivity.push({date:qaDate(),type,id:item.id,title:item.title,detail});
+  };
+  if(item.kind==='Test case'&&item.execution!=='Not Run'&&item.execution!==previous?.execution)
+    add('Test results',item.execution);
+  if(item.kind==='Defect'&&previous?.kind!=='Defect')add('New defects',item.severity||item.defect||'');
+  if(item.regression==='Verified Fix'&&previous?.regression!=='Verified Fix')add('Verified fixes','');
+}
+function dailyQAText(date){
+  const logged=(state.qaActivity??[]).filter(event=>event.date===date);
+  const retestItems=state.rows.filter(item=>item.kind==='Defect').flatMap(item=>
+    retests(item).filter(entry=>entry.date===date).map(entry=>item.id+' · '+item.title+' · '+entry.result+' · '+entry.build+' · '+entry.environment+(entry.evidence?' · '+entry.evidence:'')));
+  const groups=qaActivityTypes.map(type=>[type,logged.filter(e=>e.type===type).map(e=>e.id+' · '+e.title+(e.detail?' · '+e.detail:''))]);
+  groups.push(['Retests',retestItems]);
+  return ['Daily QA Summary · '+date,workspace.projects[workspace.active].name,
+    ...groups.map(([title,entries])=>title+' ('+entries.length+')\n'+(entries.length?entries.map(line=>'- '+line).join('\n'):'No entries recorded.'))].join('\n\n');
+}
+$('dailySummary').onclick=()=>{
+  const today=qaDate();
+  editor.innerHTML=dialogHeader('Daily QA Summary')+
+    '<div class="fields"><label>Date (Dhaka)<input id="dailyDate" type="date" value="'+today+'" autofocus></label>'+
+    '<label class="wide">Summary<textarea id="dailyText" rows="14" readonly></textarea></label></div>'+
+    '<p id="dailyStatus" role="status"></p><div class="modalActions"><button type="button" data-close>Close</button><button class="primary" id="copyDaily">Copy summary</button></div>';
+  const refresh=()=>{$('dailyText').value=$('dailyDate').value?dailyQAText($('dailyDate').value):'';$('copyDaily').disabled=!$('dailyDate').value;$('dailyStatus').textContent='';};
+  $('dailyDate').oninput=refresh;
+  $('copyDaily').onclick=async()=>{
+    const output=$('dailyText');
+    try{await navigator.clipboard.writeText(output.value);$('dailyStatus').textContent='Copied.';}
+    catch{output.focus();output.select();$('dailyStatus').textContent='Summary selected. Press Ctrl+C or Command+C to copy.';}
+  };
+  refresh();editor.showModal();
+};
+function report(x){
+editor.innerHTML=dialogHeader('Bug report')+'<p class="meta">Review details before sharing.</p><label>Report text<textarea id="reportText" rows="16">'+esc(bugText(x))+'</textarea></label><div class="modalActions"><button data-close>Close</button><button id="downloadReport">Download report</button><button class="primary" id="copyReport">Copy report</button></div><p id="reportStatus" role="status"></p>';
+editor.showModal();
+$('downloadReport').onclick=()=>download(x.id+'-bug-report.txt',$('reportText').value,'text/plain;charset=utf-8');
+$('copyReport').onclick=async()=>{try{await navigator.clipboard.writeText($('reportText').value);$('reportStatus').textContent='Copied.';}catch{$('reportText').select();$('reportStatus').textContent='Text selected. Press Ctrl+C or Command+C to copy.';}};
+}
+$('q').addEventListener('input',e=>{filters.q=e.target.value;renderContent();});
+$('filters').addEventListener('change',e=>{const k=e.target.dataset.filter;if(!k)return;filters[k]=e.target.value;if(k==='module'){delete filters.sub;renderControls();}renderContent();});
+$('saved').addEventListener('change',e=>{if(!e.target.value)return;const item=projectFilters()[Number(e.target.value)];filters={...item.filters};view=item.view;render();$('saved').value=e.target.value||String(projectFilters().indexOf(item));});
+$('saveFilter').onclick=()=>{const name=prompt('Name this saved filter');if(!name?.trim())return;const i=state.saved.findIndex(x=>x.name===name.trim());const item={name:name.trim(),view,filters:{...filters}};if(i<0)state.saved.push(item);else state.saved[i]=item;persist('Filter saved.');renderControls();};
+$('clear').onclick=()=>{filters={};render();};
+$('add').onclick=()=>edit(fresh());
+$('addSubModule').onclick=()=>{
+  editor.innerHTML='<form id="subModuleForm">'+dialogHeader('Add Sub-module')+'<div class="fields"><label>Parent Module<select name="module" required autofocus>'+choose(modules,filters.module,'Select module')+'</select></label><label>Sub-module Name<input name="sub" required maxlength="80"></label></div><p id="subModuleError" role="alert"></p><div class="modalActions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Add Sub-module</button></div></form>';
+  editor.showModal();
+};
+$('projectSelect').onchange=e=>{
+  selectProject(Number(e.target.value));persist('Project changed.');
+};
+$('addProject').onclick=()=>{
+  editor.innerHTML='<form id="projectForm">'+dialogHeader('Add Project')+'<div class="fields"><label class="wide">Project / Software name<input name="projectName" required autofocus maxlength="80"></label></div><p id="projectError" role="alert"></p><div class="modalActions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Add Project</button></div></form>';
+  editor.showModal();
+};
+function updateRename(form,changed){
+  const {kind,parent,current,newName}=form.elements;
+  form.querySelector('[data-rename-parent]').hidden=kind.value!=='Sub-module';
+  if(changed==='kind')parent.innerHTML=choose(modules,filters.module||modules[0],'Select module');
+  if(changed!=='current'){
+    const choices=kind.value==='Project'?workspace.projects.map(p=>p.name):kind.value==='Module'?modules:parent.value?subModules(parent.value):[];
+    const preferred=kind.value==='Project'?workspace.projects[workspace.active].name:kind.value==='Module'?filters.module:filters.sub;
+    current.innerHTML=choose(choices,choices.includes(preferred)?preferred:choices[0],'Select current name');
+  }
+  newName.value=current.value;
+}
+$('rename').onclick=()=>{
+  editor.innerHTML='<form id="renameForm">'+dialogHeader('Rename')+
+    '<div class="fields"><label>Rename<select name="kind" autofocus>'+['Project','Module','Sub-module'].map(kind=>option(kind)).join('')+'</select></label>'+
+    '<div data-rename-parent><label>Parent module<select name="parent"></select></label></div>'+
+    '<label>Current name<select name="current" required></select></label><label>New name<input name="newName" required maxlength="80"></label></div>'+
+    '<p id="renameError" role="alert"></p><div class="modalActions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Save name</button></div></form>';
+  updateRename($('renameForm'),'kind');editor.showModal();
+};
+function renameEntry(kind,parent,current,name){
+  if(!current||!name||name.length>80||current===name)return 'Choose a name and enter a different new name.';
+  const choices=kind==='Project'?workspace.projects.map(p=>p.name):kind==='Module'?modules:parent?subModules(parent):[];
+  if(!choices.includes(current))return 'Select a current name.';
+  if(choices.some(x=>x!==current&&x.trim().toLowerCase()===name.toLowerCase()))return 'That name already exists here.';
+  if(kind==='Project'){
+    workspace.projects.find(p=>p.name===current).name=name;
+    return '';
+  }
+  const projectRows=[...state.rows,...state.templates,...(state.customSubModules??[])];
+  if(kind==='Module'){
+    if(!state.emptyCatalog){
+      state.customModules=[...modules];
+      state.saved=[...defaultFilters.filter(f=>!state.saved.some(saved=>saved.name===f.name)).map(f=>({...f,filters:{...f.filters}})),...state.saved];
+      state.emptyCatalog=true;
+    }
+    state.customModules=state.customModules.map(module=>module===current?name:module);
+    projectRows.forEach(row=>{if(row.module===current)row.module=name;});
+    for(const filter of [filters,...state.saved.map(f=>f.filters)])if(filter.module===current)filter.module=name;
+    syncModules();
+  }else{
+    projectRows.forEach(row=>{if(row.module===parent&&row.sub===current)row.sub=name;});
+    for(const filter of [filters,...state.saved.map(f=>f.filters)]){
+      if(filter.sub===current&&(filter.module===parent||(!filter.module&&!modules.some(m=>m!==parent&&subModules(m).includes(current)))))filter.sub=name;
+    }
+  }
+  return '';
+}
+$('addModule').onclick=()=>{
+  editor.innerHTML='<form id="moduleForm">'+dialogHeader('Add Module')+'<div class="fields"><label class="wide">Module name<input name="moduleName" required autofocus maxlength="80" placeholder="e.g. Payroll"></label></div><p id="moduleError" role="alert"></p><div class="modalActions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Add Module</button></div></form>';
+  editor.showModal();
+};
+function buildPrintReport(){
+  document.querySelector('.printReport')?.remove();
+  const report=document.createElement('section');
+  report.className='printReport';
+  const title=document.createElement('h1');
+  title.textContent='QA Workspace · '+workspace.projects[workspace.active].name+' · '+(viewLabels[view]??view);
+  const meta=document.createElement('p');
+  meta.className='printMeta';
+  meta.textContent=printScope();
+  const content=$('content').cloneNode(true);
+  content.removeAttribute('id');
+  content.querySelectorAll('.recordId').forEach(node=>node.replaceWith(document.createTextNode(node.textContent)));
+  content.querySelectorAll('.actions,button').forEach(node=>node.remove());
+  const original=$('content').querySelectorAll('select[data-exec]');
+  content.querySelectorAll('select[data-exec]').forEach((select,i)=>{
+    select.replaceWith(document.createTextNode(original[i].value||'—'));
+  });
+  const attribution=document.createElement('p');
+  attribution.className='printMeta';
+  attribution.textContent=preparedBy;
+  report.append(title,attribution,meta,content);
+  document.body.append(report);
+}
+window.addEventListener('beforeprint',buildPrintReport);
+window.addEventListener('afterprint',()=>document.querySelector('.printReport')?.remove());
+function printScope(){
+  const filterText=activeFilters().map(k=>k==='metric'?'Dashboard: '+(metricViews[filters[k]]?.label??filters[k]):(labels[k]??'Search')+': '+filters[k]);
+  const content=$('content');
+  const count=view==='Templates'?content.querySelectorAll('article').length:view==='Findings & assumptions'?new Set(Array.from(content.querySelectorAll('[data-edit]'),button=>button.dataset.edit)).size:content.querySelectorAll('tbody tr').length;
+  const unit=view==='Templates'?' templates':view==='Defects'?' defects':view==='Test cases'?' test cases':' records';
+  return [count+unit,...(filterText.length?filterText:['All records in this view'])].join(' / ');
+}
+$('print').onclick=()=>{
+  editor.innerHTML=dialogHeader('Print preview')+'<p><strong>'+esc(workspace.projects[workspace.active].name)+' / '+esc(viewLabels[view]??view)+'</strong></p><p>'+esc(printScope())+'</p><div class="modalActions"><button type="button" data-close>Cancel</button><button type="button" class="primary" id="confirmPrint">Print / Save as PDF</button></div>';
+  $('confirmPrint').onclick=()=>{editor.close();printCurrentView();};
+  editor.showModal();
+};
+function printCurrentView(){
+  buildPrintReport();
+  try{window.print();}
+  catch{tell('Print could not open. Open the downloaded HTML in Chrome or Edge and try again.');}
+};
+function validateBackup(backup){
+  const object=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+  const strings=x=>object(x)&&Object.values(x).every(v=>typeof v==='string');
+  if(!object(backup)||backup.format!=='qa-regression-desk'||backup.version!==1)
+    throw new Error('Select a QA Workspace JSON backup (version 1).');
+  const {rows,templates,saved,customModules=[],customSubModules=[],emptyCatalog=false,qaActivity=[]}=backup.data??{};
+  if(typeof emptyCatalog!=='boolean')throw new Error('Invalid project module catalog.');
+  const names=new Set(emptyCatalog?[]:defaultModules.map(name=>name.toLowerCase()));
+  if(!Array.isArray(customModules)||!customModules.every(name=>{
+    if(typeof name!=='string'||!name.trim()||name!==name.trim()||name.length>80||names.has(name.toLowerCase()))return false;
+    names.add(name.toLowerCase());return true;
+  }))throw new Error('Backup contains invalid or duplicate module names.');
+  const backupModules=[...(emptyCatalog?[]:defaultModules),...customModules];
+  if(!Array.isArray(rows)||!Array.isArray(templates)||!Array.isArray(saved))
+    throw new Error('Backup is missing records, templates or saved filters.');
+  const ids=new Set();
+  for(const row of rows){
+    if(!strings(row)||!row.id?.trim()||!row.title?.trim()||!backupModules.includes(row.module)||
+      !['Test case','Defect'].includes(row.kind)||!options.execution.includes(row.execution))
+      throw new Error('Backup contains an invalid record.');
+    const id=row.id.trim().toLowerCase();
+    if(ids.has(id))throw new Error('Backup contains duplicate record IDs.');
+    ids.add(id);
+  }
+  if(!templates.every(t=>strings(t)&&t.title?.trim()&&backupModules.includes(t.module))||
+     !saved.every(s=>object(s)&&typeof s.name==='string'&&s.name.trim()&&views.includes(s.view)&&strings(s.filters)))
+    throw new Error('Backup contains an invalid template or saved filter.');
+  const subKeys=new Set();
+  if(!Array.isArray(customSubModules)||!customSubModules.every(item=>{
+    if(!strings(item)||!backupModules.includes(item.module)||!item.sub?.trim()||item.sub!==item.sub.trim()||item.sub.length>80)return false;
+    const id=JSON.stringify([item.module,item.sub.toLowerCase()]);
+    if(subKeys.has(id))return false;
+    subKeys.add(id);return true;
+  }))throw new Error('Backup contains invalid or duplicate sub-modules.');
+  if(!Array.isArray(qaActivity)||!qaActivity.every(e=>strings(e)&&[e.date,e.type,e.id,e.title,e.detail].every(v=>typeof v==='string')&&qaActivityTypes.includes(e.type)&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)))
+    throw new Error('Invalid daily QA activity.');
+  return {rows,templates,saved,customModules,customSubModules,emptyCatalog,qaActivity};
+}
+function validateWorkspaceBackup(backup){
+  if(backup?.version!==2)return wrapLegacy(validateBackup(backup));
+  const projects=backup.data?.projects,active=backup.data?.active;
+  if(backup.format!=='qa-regression-desk'||!Array.isArray(projects)||!Number.isInteger(active)||active<0||active>=projects.length)
+    throw new Error('Invalid project backup.');
+  const names=new Set();
+  return {active,projects:projects.map(project=>{
+    const name=project?.name;
+    if(typeof name!=='string'||!name.trim()||name.trim()!==name||name.length>80||names.has(name.toLowerCase()))
+      throw new Error('Invalid or duplicate project name.');
+    names.add(name.toLowerCase());
+    return {name,data:validateBackup({format:backup.format,version:1,data:project.data})};
+  })};
+}
+$('backup').onclick=()=>{
+  const backup={format:'qa-regression-desk',version:2,data:workspace};
+  download('qa-regression-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(backup,null,2),'application/json');
+  lastBackup={time:Date.now(),fingerprint:backupFingerprint()};
+  try{localStorage.setItem(backupStatusKey,JSON.stringify(lastBackup));}catch{}
+  renderBackupStatus();
+  tell('Backup download started.');
+};
+$('restore').onclick=()=>$('backupFile').click();
+$('backupFile').addEventListener('change',async e=>{
+  const file=e.target.files[0];
+  e.target.value='';
+  if(!file)return;
+  let incoming;
+  try{incoming=validateWorkspaceBackup(JSON.parse((await file.text()).replace(/^\uFEFF/,'')));}
+  catch(error){tell('Restore failed. '+(error instanceof SyntaxError?'Select a valid JSON backup.':error.message));return;}
+  const summary=incoming.projects.length+' project(s) with '+incoming.projects.reduce((count,project)=>count+project.data.rows.length,0)+' records';
+  if(!confirm('Restore '+summary+'? This replaces the data in this browser. Download a backup of its existing data first if needed.')){
+    tell('Restore canceled.');return;
+  }
+  try{if(!saveWorkspace(incoming))return;}
+  catch{tell('Restore failed. Browser storage could not save the backup.');return;}
+  workspace=incoming;selectProject(workspace.active);
+  tell('Restored '+summary+'.');
+});
+
+$('export').onclick=()=>{
+const columns=view==='Templates'?Object.keys(templateOf({})):['id','kind','title','module','sub','type','priority','severity','execution','defect','regression','automation','tool','defectId',...longKeys];
+const csv=value=>{let text=String(value??'');if(/^[\s\uFEFF]*[=+@-]/.test(text)||/^[\r\t]/.test(text))text="'"+text;return '"'+text.replaceAll('"','""')+'"';};
+const rows=view==='Templates'?state.templates.filter(t=>Object.values(t).join(' ').toLowerCase().includes((filters.q??'').trim().toLowerCase())):matches();
+download('qa-regression-'+view.toLowerCase().replace(/[^a-z]+/g,'-')+'.csv','\uFEFF'+[columns.map(k=>labels[k]).map(csv).join(','),...rows.map(x=>columns.map(k=>csv(x[k])).join(','))].join('\r\n'),'text/csv;charset=utf-8');
+};
+$('content').addEventListener('change',e=>{if(!e.target.dataset.exec||!e.target.value)return;const item=state.rows.find(x=>x.id===e.target.dataset.exec);if(!item||item.execution===e.target.value)return;const previous={execution:item.execution,kind:item.kind,regression:item.regression};item.execution=e.target.value;recordQAActivity(item,previous);const message=item.id+' marked as '+item.execution+'.';
+const oldProgress=$('metrics').querySelector('progress')?.value;
+persist(message);
+renderMetrics();
+const progress=$('metrics').querySelector('progress');
+if(progress&&oldProgress!==undefined&&oldProgress!==progress.value&&window.matchMedia('(prefers-reduced-motion: no-preference)').matches){
+  const target=progress.value;
+  progress.value=oldProgress;
+  const start=performance.now();
+  const animate=now=>{
+    if(!progress.isConnected)return;
+    const fraction=Math.min(1,Math.max(0,(now-start)/220));
+    progress.value=oldProgress+(target-oldProgress)*fraction;
+    if(fraction<1)requestAnimationFrame(animate);
+  };
+  requestAnimationFrame(animate);
+}
+const scroll=e.target.closest('.stickyTable');
+const tables=Array.from($('content').querySelectorAll('.stickyTable'));
+const positions=tables.map(table=>[table.scrollLeft,table.scrollTop]);
+const tableIndex=tables.indexOf(scroll);
+renderContent();
+$('content').querySelectorAll('.stickyTable').forEach((table,i)=>{
+  if(positions[i]){[table.scrollLeft,table.scrollTop]=positions[i];}
+});
+const updated=Array.from($('content').querySelectorAll('[data-exec]')).find(control=>control.dataset.exec===item.id);
+updated?.closest('tr').classList.add('executionUpdated');
+(updated??$('content').querySelectorAll('.stickyTable')[tableIndex]??$('q')).focus({preventScroll:true});
+});
+document.addEventListener('click',e=>{
+const menu=$('manageMenu');
+if(menu.open&&(!menu.contains(e.target)||e.target.closest('.manageActions button')))menu.open=false;
+const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+if(Object.hasOwn(metricViews,d.metric)){
+  view=metricViews[d.metric].view;filters={metric:d.metric};render();
+  $('content').scrollIntoView({block:'nearest'});
+}else if(d.view){if(view!==d.view)delete filters.metric;if(d.view==='Archived items'||view==='Archived items')filters={};view=d.view;render();}else if(d.module){filters={module:d.module};view='Matrix';render();}
+else if(d.details){
+  const row=state.rows.find(x=>x.id===d.details);
+  if(!row)return;
+  const fields=['pre','data','steps','expected','actual','evidence','defectId','notes'];
+  const linked=state.rows.find(x=>x.kind==='Defect'&&sameDefectId(row.defectId,x.id));
+  editor.classList.add('detailsDrawer');
+  editor.innerHTML=dialogHeader(row.id)+'<p>'+esc(row.title)+'</p><dl class="recordDetails">'+fields.map(k=>'<dt>'+esc(labels[k]??k)+'</dt><dd>'+esc((k==='defectId'&&linked?linked.id+' - '+linked.title:row[k])||'None recorded')+'</dd>').join('')+'</dl>';
+  editor.addEventListener('close',()=>editor.classList.remove('detailsDrawer'),{once:true});
+  editor.showModal();
+}
+else if(d.edit){const i=state.rows.findIndex(x=>x.id===d.edit);edit(state.rows[i],i);}
+else if(b.id==='archiveItem'){
+  const item=state.rows[editing];
+  if(!item||item.archivedAt||!confirm('Archive '+item.id+'? Unsaved edits will be discarded.'))return;
+  item.archivedAt=new Date().toISOString();
+  editor.close();persist('Archived '+item.id+'.');render();
+}
+else if(d.restoreItem||d.deleteItem){
+  const id=d.restoreItem||d.deleteItem;
+  const index=state.rows.findIndex(x=>x.id===id&&x.archivedAt);
+  if(index<0)return;
+  if(d.restoreItem){
+    delete state.rows[index].archivedAt;
+    persist('Restored '+id+'.');
+  }else{
+    const item=state.rows[index];
+    const links=item.kind==='Defect'?state.rows.filter(x=>sameDefectId(x.defectId,id)):[];
+    const warning=links.length?' This also clears '+links.length+' linked defect reference(s).':'';
+    if(!confirm('Permanently delete '+id+'? This cannot be undone.'+warning))return;
+    state.rows.splice(index,1);
+    links.forEach(x=>{x.defectId='';});
+    persist('Permanently deleted '+id+'.');
+  }
+  render();
+}
+else if(d.logDefect){
+  const test=state.rows.find(x=>x.id===d.logDefect&&x.kind==='Test case'&&x.execution==='Fail'&&!x.archivedAt&&!x.defectId);
+  if(!test)return;
+  const copied={};
+  for(const key of ['module','sub','title','type','pre','data','steps','expected','actual','evidence'])
+    copied[key]=test[key]??'';
+  edit(fresh({...copied,kind:'Defect',execution:'Fail'}),null,false,test);
+}
+else if(d.retest){const item=state.rows.find(x=>x.id===d.retest&&x.kind==='Defect'&&!x.archivedAt);if(item)openRetests(item);}
+else if(d.report){report(state.rows.find(x=>x.id===d.report));}
+else if(d.template!==undefined){edit(fresh(templateOf(state.templates[Number(d.template)])));}
+else if(d.templateEdit!==undefined){edit(state.templates[Number(d.templateEdit)],Number(d.templateEdit),true);}
+else if(b.id==='newTemplate'){edit({module:filters.module||modules[0]||''},null,true);}
+else if(d.close!==undefined){editor.close();}
+else if(b.id==='duplicateTest'){
+  const original=state.rows[editing];
+  if(!original||original.kind!=='Test case'||original.archivedAt)return;
+  const copy=templateOf(values($('rowForm')));
+  copy.title=(copy.title||original.title)+' (copy)';
+  editor.close();
+  edit(fresh({...copy,kind:'Test case',automation:copy.automation==='Automated'?'Candidate':copy.automation}));
+}
+else if(b.id==='asTemplate'){
+const form=$('rowForm');if(!form.elements.title.value.trim())return form.elements.title.reportValidity();
+state.templates.push(templateOf(values(form)));persist('Template saved.');editor.close();view='Templates';filters={};render();
+}
+});
+editor.addEventListener('change',e=>{
+  const form=e.target.form;
+  if(form?.id==='renameForm'){if(['kind','parent','current'].includes(e.target.name))updateRename(form,e.target.name);return;}
+  if(form?.id==='rowForm'&&e.target.name==='module')
+    form.elements.sub.innerHTML=choose(e.target.value?subModules(e.target.value):[],'','Select');
+});
+editor.addEventListener('submit',e=>{
+e.preventDefault();
+if(e.target.id==='renameForm'){
+  const {kind,parent,current,newName}=values(e.target);
+  const error=renameEntry(kind,parent,current,newName);
+  if(error){$('renameError').textContent=error;return;}
+  editor.close();persist('Renamed to '+newName+'.');render();return;
+}
+if(e.target.id==='subModuleForm'){
+  const module=e.target.elements.module.value;
+  const sub=e.target.elements.sub.value.trim();
+  if(!modules.includes(module)||!sub||sub.length>80){
+    $('subModuleError').textContent='Select a parent module and enter a sub-module name.';return;
+  }
+  if(subModules(module).some(name=>name.trim().toLowerCase()===sub.toLowerCase())){
+    $('subModuleError').textContent='This sub-module already exists under the selected module.';return;
+  }
+  state.customSubModules??=[];
+  state.customSubModules.push({module,sub});
+  persist('Sub-module added.');editor.close();render();return;
+}
+if(e.target.id==='retestForm'){
+  const entry=values(e.target);
+  if(!retestTarget||!state.rows.includes(retestTarget)||retestTarget.archivedAt||
+     retestTarget.kind!=='Defect'||!entry.date||!entry.build||!entry.environment||!retestResults.includes(entry.result)){
+    $('retestError').textContent='Enter the retest date, build, environment and result.';return;
+  }
+  retestTarget.retestHistory=JSON.stringify([...retests(retestTarget),entry]);
+  persist('Retest saved for '+retestTarget.id+'.');
+  renderContent();openRetests(retestTarget);return;
+}
+if(e.target.id==='projectForm'){
+  const name=e.target.elements.projectName.value.trim();
+  if(!name||name.length>80||workspace.projects.some(project=>project.name.toLowerCase()===name.toLowerCase())){
+    $('projectError').textContent='Enter a unique project name.';return;
+  }
+  workspace.projects.push({name,data:{rows:[],templates:[],saved:[],emptyCatalog:true}});
+  editor.close();selectProject(workspace.projects.length-1);persist('Project added. Add a module to get started.');return;
+}
+if(e.target.id==='moduleForm'){
+  const name=e.target.elements.moduleName.value.trim();
+  if(!name||modules.some(m=>m.toLowerCase()===name.toLowerCase())){
+    $('moduleError').textContent='Enter a unique module name.';return;
+  }
+  state.customModules??=[];
+  state.customModules.push(name);
+  syncModules();
+  persist('Module added. Use it when creating a test case or defect.');
+  editor.close();render();return;
+}
+const x={...draft,...values(e.target)};
+if(!x.title||!x.module||(!templateMode&&(!x.id||!x.kind||!x.execution))){$('formError').textContent='Enter the required fields and select the module, record type and execution status for a record.';return;}
+if(!templateMode&&state.rows.some((r,i)=>i!==editing&&r.id.toLowerCase()===x.id.toLowerCase())){$('formError').textContent='This record ID already exists.';return;}
+if(sourceCase&&(x.kind!=='Defect'||!state.rows.includes(sourceCase)||sourceCase.archivedAt||sourceCase.defectId)){
+  $('formError').textContent='Save this as a defect linked to the original failed test case.';return;
+}
+const list=templateMode?state.templates:state.rows;
+if(!templateMode)recordQAActivity(x,editing===null?null:list[editing]);
+if(editing===null){list.push(x);if(sourceCase)sourceCase.defectId=x.id;if(!templateMode){view=x.kind==='Defect'?'Defects':'Test cases';filters={};}}else{const old=list[editing];list[editing]=x;if(!templateMode&&old.kind==='Defect'&&old.id!==x.id)state.rows.forEach(r=>{if(sameDefectId(r.defectId,old.id))r.defectId=x.id;});}
+persist('Saved.');editor.close();render();
+});
+render();renderBackupStatus();
+window.addEventListener('focus',renderBackupStatus);</script></body></html>
